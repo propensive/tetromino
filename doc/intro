@@ -1,0 +1,2 @@
+Tetromino helps to manage memory allocations, particularly for streaming applications, by controlling and monitoring the allocation and release of
+blocks of memory. Tags (called `Rubric`s) are used to limit allocations for different purposes.

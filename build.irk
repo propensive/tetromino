@@ -1,0 +1,21 @@
+{
+  "repos": [
+    {
+      "base": "../one/mod/rudiments",
+      "url": "https://github.com/propensive/rudiments"
+    }
+  ],
+  "imports": [
+    "../one/mod/rudiments/build.irk"
+  ],
+  "modules": [
+    {
+      "name": "Tetromino",
+      "id": "tetromino/core",
+      "sources": ["src/core"],
+      "links": ["rudiments/core"],
+      "version": "0.4.0",
+      "docs": ["doc"]
+    }
+  ]
+}
