@@ -13,51 +13,55 @@
     either express or implied. See the License for the specific language governing permissions
     and limitations under the License.
 */
-
 package tetromino
 
 import rudiments.*
+import parasitism.*
 import scala.collection.mutable as scm
 import java.lang.ref as jlr
 
-case class OverallocationError(rubrics: Rubric*)(using Codepoint)
-extends Error(err"attempted to allocated more memory than available for $rubrics")(pos)
+case class ExcessDataError(rubrics: Rubric*)
+extends Error(err"attempted to allocated more memory than available for $rubrics")
 
 package allocators:
-  given default: Allocator = rubric => 10.mb
+  def default(using Monitor): Allocator = new Allocator():
+    def limit(rubric: Rubric): ByteSize = 10.mb
 
 case class Rubric()
 object Total extends Rubric()
 
-abstract class Allocator():
-  private var allocations: scm.Map[Rubric, ByteSize] = scm.HashMap().withDefault(0.b.waive)
-  private var weakRefs: scm.Map[jlr.Reference[?], (ByteSize, Set[Rubric])] = scm.HashMap()
+abstract class Allocator()(using Monitor):
+  private val allocations: scm.Map[Rubric, ByteSize] = scm.HashMap().withDefault(0.b.waive)
+  private val weakRefs: scm.Map[jlr.Reference[?], (ByteSize, Set[Rubric])] = scm.HashMap()
   private val queue: jlr.ReferenceQueue[Array[Byte]] = jlr.ReferenceQueue()
-  @volatile private var continue = false
- 
+  @volatile private var continue = true
+
+  private val processor: Task[Unit] = Task(Text("processor"))(process())
+
   @tailrec
   private def process(): Unit =
-    synchronized:
-      Option(queue.remove(100)).map(_.nn).foreach: ref =>
+    Option(queue.remove(100)).map(_.nn).foreach: ref =>
+      synchronized:
         val (size, rubrics) = weakRefs(ref)
-  
-        rubrics.foreach: rubric =>
-          allocations(rubric) -= size
+        weakRefs -= ref
+        rubrics.foreach(release(_, size))
     
     if continue then process()
 
-  def release(rubric: Rubric, size: ByteSize): Unit = synchronized:
+  def release(rubric: Rubric, size: ByteSize): Unit =
+    System.out.nn.println("Releasing "+size)
     allocations(rubric) -= size
   
   def limit(rubric: Rubric): ByteSize
 
-  def allocate(size: ByteSize, rubrics: Rubric*): Array[Byte] throws OverallocationError = synchronized:
+  def allocate(size: ByteSize, rubrics: Rubric*): Array[Byte] throws ExcessDataError = synchronized:
     val excess = rubrics.filter: rubric =>
       allocations(rubric) + size > limit(rubric)
     
-    if !allocations.isEmpty then throw OverallocationError(excess*) else
+    if !excess.isEmpty then throw ExcessDataError(excess*) else
       val array = new Array[Byte](size.long.toInt)
       val ref = jlr.WeakReference(array, queue)
       weakRefs(ref) = size -> rubrics.to(Set)
       rubrics.foreach(allocations(_) += size)
       array
+

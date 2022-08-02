@@ -1,21 +1,22 @@
 {
   "repos": [
     {
-      "base": "../one/mod/rudiments",
-      "url": "https://github.com/propensive/rudiments"
+      "base": "../parasitism",
+      "url": "https://github.com/propensive/parasitism"
     }
   ],
   "imports": [
-    "../one/mod/rudiments/build.irk"
+    "../parasitism/build.irk"
   ],
   "modules": [
     {
       "name": "Tetromino",
       "id": "tetromino/core",
       "sources": ["src/core"],
-      "links": ["rudiments/core"],
+      "links": ["parasitism/core"],
       "version": "0.4.0",
-      "docs": ["doc"]
+      "docs": ["doc"],
+      "artifact": { "path": "tetromino.jar", "format": "fat-jar" }
     }
   ]
 }
