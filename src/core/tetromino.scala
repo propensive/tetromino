@@ -20,8 +20,8 @@ import rudiments.*
 import scala.collection.mutable as scm
 import java.lang.ref as jlr
 
-case class OverallocationError(rubrics: Rubric*)(using Codepoint)
-extends Error(err"attempted to allocated more memory than available for $rubrics")(pos)
+case class OverallocationError(rubrics: Rubric*)
+extends Error(err"attempted to allocated more memory than available for $rubrics")
 
 package allocators:
   given default: Allocator = rubric => 10.mb
