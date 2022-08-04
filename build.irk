@@ -1,12 +1,12 @@
 {
   "repos": [
     {
-      "base": "../one/mod/rudiments",
+      "base": "../rudiments",
       "url": "https://github.com/propensive/rudiments"
     }
   ],
   "imports": [
-    "../one/mod/rudiments/build.irk"
+    "../rudiments/build.irk"
   ],
   "modules": [
     {
