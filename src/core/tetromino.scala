@@ -20,8 +20,7 @@ import parasitism.*
 import scala.collection.mutable as scm
 import java.lang.ref as jlr
 
-case class ExcessDataError(rubrics: Rubric*)
-extends Error(err"attempted to allocated more memory than available for $rubrics")
+case class ExcessDataError(rubrics: Rubric*) extends Error(err"attempted to allocated more memory than available for $rubrics")
 
 package allocators:
   def default(using Monitor): Allocator = new Allocator():

@@ -1,12 +1,12 @@
 {
   "repos": [
     {
-      "base": "../parasitism",
-      "url": "https://github.com/propensive/parasitism"
+      "base": "../rudiments",
+      "url": "https://github.com/propensive/rudiments"
     }
   ],
   "imports": [
-    "../parasitism/build.irk"
+    "../rudiments/build.irk"
   ],
   "modules": [
     {
