@@ -23,13 +23,13 @@ import java.lang.ref as jlr
 case class ExcessDataError(rubrics: Rubric*) extends Error(err"attempted to allocated more memory than available for $rubrics")
 
 package allocators:
-  def default(using Monitor): Allocator = new Allocator():
+  given default(using Monitor, Threading): Allocator = new Allocator():
     def limit(rubric: Rubric): ByteSize = 10.mb
 
 case class Rubric()
 object Total extends Rubric()
 
-abstract class Allocator()(using Monitor):
+abstract class Allocator()(using Monitor, Threading):
   private val allocations: scm.Map[Rubric, ByteSize] = scm.HashMap().withDefault(0.b.waive)
   private val weakRefs: scm.Map[jlr.Reference[?], (ByteSize, Set[Rubric])] = scm.HashMap()
   private val queue: jlr.ReferenceQueue[Array[Byte]] = jlr.ReferenceQueue()
